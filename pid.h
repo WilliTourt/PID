@@ -1,5 +1,6 @@
-#include <cmath>
+#pragma once
 
+#include <cmath>
 
 /**
  * Formulations and equations of PID controller:

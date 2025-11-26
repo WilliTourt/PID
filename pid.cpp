@@ -46,10 +46,11 @@ void PIDCtrller::setIntegralMode(IntegralMode_t mode) {
 
 void PIDCtrller::setIntegralMode(IntegralMode_t mode, float value) {
     _integral_mode = mode;
+
     if (mode == IntegralMode_t::Clamped) {
-        _clamped_integral_limit = value;
+        _clamped_integral_limit = fabs(value);
     } else if (mode == IntegralMode_t::Conditional) {
-        _cond_integral_error_threshold = value;
+        _cond_integral_error_threshold = fabs(value);
     }
 }
 
@@ -106,7 +107,7 @@ float PIDCtrller::calc(float curr_measurement, float upperLimit, float lowerLimi
         case IntegralMode_t::Clamped:
             _error_integral += _error * _sample_time;
             if (std::fabs(_error_integral) > _clamped_integral_limit) {
-                _error_integral = _clamped_integral_limit;
+                _error_integral = (_error_integral > 0.0f) ? _clamped_integral_limit : -_clamped_integral_limit;
             }
             break;
         case IntegralMode_t::Conditional:
