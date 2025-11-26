@@ -45,18 +45,18 @@
  * 
  */
 
-#define _DEFAULT_SAMPLE_TIME 1.0f
+#define PID_DEFAULT_SAMPLE_TIME 1.0f
 
-#define _DEFAULT_PROP_WEIGHT 1.0f
-#define _DEFAULT_CLAMP_INT_LIMIT 200.0f
-#define _DEFAULT_COND_INT_ERR_THRESHOLD 20.0f
-#define _DEFAULT_DERIVATIVE_WEIGHT 1.0f
-#define _DEFAULT_DEADZONE 0.0f
+#define PID_DEFAULT_PROP_WEIGHT 1.0f
+#define PID_DEFAULT_CLAMP_INT_LIMIT 200.0f
+#define PID_DEFAULT_COND_INT_ERR_THRESHOLD 20.0f
+#define PID_DEFAULT_DERIVATIVE_WEIGHT 1.0f
+#define PID_DEFAULT_DEADZONE 0.0f
 
 class PIDCtrller {
     public:
 
-        enum class PropotionalMode_t {
+        enum class ProportionalMode_t {
             Standard,
             OnMeasurement,
             Weighted
@@ -80,8 +80,8 @@ class PIDCtrller {
         void setTarget(float target);
         void setSampleTime(float sample_time);
 
-        void setPropotionalMode(PropotionalMode_t mode);
-        void setPropotionalMode(PropotionalMode_t mode, float weight);
+        void setProportionalMode(ProportionalMode_t mode);
+        void setProportionalMode(ProportionalMode_t mode, float weight);
         void setIntegralMode(IntegralMode_t mode);
         void setIntegralMode(IntegralMode_t mode, float value);
         void setDerivativeMode(DerivativeMode_t mode);
@@ -92,9 +92,9 @@ class PIDCtrller {
 
         void reset();
 
-        inline float getLastOutput() { return _output; }
-        inline float getError() { return _error; }
-        inline float getIntegral() { return _error_integral; }
+        inline float getLastOutput() const { return _output; }
+        inline float getError() const { return _error; }
+        inline float getIntegral() const { return _error_integral; }
 
     private:
 
@@ -106,12 +106,12 @@ class PIDCtrller {
         float _error, _error_integral, _prev_error;
         float _prev_measurement, _prev_target;
 
-        float _propotional_weight;
+        float _proportional_weight;
         float _clamped_integral_limit;
         float _cond_integral_error_threshold;
         float _derivative_weight;
 
-        PropotionalMode_t _propotional_mode;
+        ProportionalMode_t _proportional_mode;
         IntegralMode_t _integral_mode;
         DerivativeMode_t _derivative_mode;
 

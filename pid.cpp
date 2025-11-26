@@ -2,19 +2,21 @@
 
 PIDCtrller::PIDCtrller(float kp, float ki, float kd) :
     _kp(kp), _ki(ki), _kd(kd),
-    _sample_time(_DEFAULT_SAMPLE_TIME),
+    _sample_time(PID_DEFAULT_SAMPLE_TIME),
     _output(0.0f),
     _target(0.0f),
     _error(0.0f), _error_integral(0.0f), _prev_error(0.0f),
     _prev_measurement(0.0f), _prev_target(0.0f),
-    _propotional_weight(_DEFAULT_PROP_WEIGHT),
-    _clamped_integral_limit(_DEFAULT_CLAMP_INT_LIMIT),
-    _cond_integral_error_threshold(_DEFAULT_COND_INT_ERR_THRESHOLD),
-    _derivative_weight(_DEFAULT_DERIVATIVE_WEIGHT),
-    _propotional_mode(PropotionalMode_t::Standard),
+    _proportional_weight(PID_DEFAULT_PROP_WEIGHT),
+    _clamped_integral_limit(PID_DEFAULT_CLAMP_INT_LIMIT),
+    _cond_integral_error_threshold(PID_DEFAULT_COND_INT_ERR_THRESHOLD),
+    _derivative_weight(PID_DEFAULT_DERIVATIVE_WEIGHT),
+    _proportional_mode(ProportionalMode_t::Standard),
     _integral_mode(IntegralMode_t::Standard),
     _derivative_mode(DerivativeMode_t::Standard),
-    _deadzone(_DEFAULT_DEADZONE) {}
+    _deadzone(PID_DEFAULT_DEADZONE) {
+        if (_sample_time <= 0.0f) { _sample_time = PID_DEFAULT_SAMPLE_TIME; }
+    }
 
 void PIDCtrller::setParams(float kp, float ki, float kd) {
     _kp = kp;
@@ -28,16 +30,17 @@ void PIDCtrller::setTarget(float target) {
 }
 
 void PIDCtrller::setSampleTime(float sample_time) {
+    if (sample_time <= 0.0f) { sample_time = PID_DEFAULT_SAMPLE_TIME; }
     _sample_time = sample_time;
 }
 
-void PIDCtrller::setPropotionalMode(PropotionalMode_t mode) {
-    _propotional_mode = mode;
+void PIDCtrller::setProportionalMode(ProportionalMode_t mode) {
+    _proportional_mode = mode;
 }
 
-void PIDCtrller::setPropotionalMode(PropotionalMode_t mode, float weight) {
-    _propotional_mode = mode;
-    _propotional_weight = weight;
+void PIDCtrller::setProportionalMode(ProportionalMode_t mode, float weight) {
+    _proportional_mode = mode;
+    _proportional_weight = weight;
 }
 
 void PIDCtrller::setIntegralMode(IntegralMode_t mode) {
@@ -64,6 +67,7 @@ void PIDCtrller::setDerivativeMode(DerivativeMode_t mode, float weight) {
 }
 
 void PIDCtrller::setDeadzone(float deadzone) {
+    if (deadzone < 0.0f) { deadzone = -deadzone; }
     _deadzone = deadzone;
 }
 
@@ -77,24 +81,31 @@ void PIDCtrller::reset() {
 }
 
 float PIDCtrller::calc(float curr_measurement, float upperLimit, float lowerLimit) {
+    if (lowerLimit > upperLimit) {
+        std::swap(lowerLimit, upperLimit);
+    }
+
     _error = _target - curr_measurement;
 
-    if (std::fabs(_error) < _deadzone) { _error = 0.0f; }
+    if (std::fabs(_error) < _deadzone) {
+        _error = 0.0f;
+        _prev_error = 0.0f;
+    }
 
     float delta_e = _error - _prev_error;
     float delta_m = curr_measurement - _prev_measurement;
 
     // P
     float p = 0.0f;
-    switch (_propotional_mode) {
-        case PropotionalMode_t::Standard:
+    switch (_proportional_mode) {
+        case ProportionalMode_t::Standard:
             p = _kp * _error;
             break;
-        case PropotionalMode_t::OnMeasurement:
+        case ProportionalMode_t::OnMeasurement:
             p = -_kp * curr_measurement;
             break;
-        case PropotionalMode_t::Weighted:
-            p = _kp * (_propotional_weight * _target - curr_measurement);
+        case ProportionalMode_t::Weighted:
+            p = _kp * (_proportional_weight * _target - curr_measurement);
             break;
     }
 
