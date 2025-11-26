@@ -1,5 +1,11 @@
 #include "pid.h"
 
+/**
+ * @brief Constructor implementation - initializes PID controller with gains
+ * @param kp Proportional gain
+ * @param ki Integral gain
+ * @param kd Derivative gain
+ */
 PIDCtrller::PIDCtrller(float kp, float ki, float kd) :
     _kp(kp), _ki(ki), _kd(kd),
     _sample_time(PID_DEFAULT_SAMPLE_TIME),
@@ -18,35 +24,67 @@ PIDCtrller::PIDCtrller(float kp, float ki, float kd) :
         if (_sample_time <= 0.0f) { _sample_time = PID_DEFAULT_SAMPLE_TIME; }
     }
 
+/**
+ * @brief Set PID gains implementation
+ * @param kp Proportional gain
+ * @param ki Integral gain
+ * @param kd Derivative gain
+ */
 void PIDCtrller::setParams(float kp, float ki, float kd) {
     _kp = kp;
     _ki = ki;
     _kd = kd;
 }
 
+/**
+ * @brief Set target value implementation
+ * @param target Desired target value
+ */
 void PIDCtrller::setTarget(float target) {
     _prev_target = _target;
     _target = target;
 }
 
+/**
+ * @brief Set sample time implementation
+ * @param sample_time Time between calculations in seconds
+ */
 void PIDCtrller::setSampleTime(float sample_time) {
     if (sample_time <= 0.0f) { sample_time = PID_DEFAULT_SAMPLE_TIME; }
     _sample_time = sample_time;
 }
 
+/**
+ * @brief Set proportional mode without weight implementation
+ * @param mode Proportional mode to set
+ */
 void PIDCtrller::setProportionalMode(ProportionalMode_t mode) {
     _proportional_mode = mode;
 }
 
+/**
+ * @brief Set proportional mode with weight implementation
+ * @param mode Proportional mode to set
+ * @param weight Weight parameter for weighted proportional mode
+ */
 void PIDCtrller::setProportionalMode(ProportionalMode_t mode, float weight) {
     _proportional_mode = mode;
     _proportional_weight = weight;
 }
 
+/**
+ * @brief Set integral mode without additional parameter implementation
+ * @param mode Integral mode to set
+ */
 void PIDCtrller::setIntegralMode(IntegralMode_t mode) {
     _integral_mode = mode;
 }
 
+/**
+ * @brief Set integral mode with additional parameter implementation
+ * @param mode Integral mode to set
+ * @param value Limit value for clamped mode or threshold for conditional mode
+ */
 void PIDCtrller::setIntegralMode(IntegralMode_t mode, float value) {
     _integral_mode = mode;
 
@@ -57,20 +95,36 @@ void PIDCtrller::setIntegralMode(IntegralMode_t mode, float value) {
     }
 }
 
+/**
+ * @brief Set derivative mode without weight implementation
+ * @param mode Derivative mode to set
+ */
 void PIDCtrller::setDerivativeMode(DerivativeMode_t mode) {
     _derivative_mode = mode;
 }
 
+/**
+ * @brief Set derivative mode with weight implementation
+ * @param mode Derivative mode to set
+ * @param weight Weight parameter for weighted derivative mode
+ */
 void PIDCtrller::setDerivativeMode(DerivativeMode_t mode, float weight) {
     _derivative_mode = mode;
     _derivative_weight = weight;
 }
 
+/**
+ * @brief Set deadzone implementation
+ * @param deadzone Deadzone value (absolute value will be used)
+ */
 void PIDCtrller::setDeadzone(float deadzone) {
     if (deadzone < 0.0f) { deadzone = -deadzone; }
     _deadzone = deadzone;
 }
 
+/**
+ * @brief Reset controller state implementation
+ */
 void PIDCtrller::reset() {
     _output = 0.0f;
     _error = 0.0f;
@@ -80,6 +134,13 @@ void PIDCtrller::reset() {
     _prev_target = _target;
 }
 
+/**
+ * @brief Calculate PID output implementation
+ * @param curr_measurement Current measurement value
+ * @param upperLimit Upper limit for output clamping
+ * @param lowerLimit Lower limit for output clamping
+ * @return Calculated PID output value
+ */
 float PIDCtrller::calc(float curr_measurement, float upperLimit, float lowerLimit) {
     if (lowerLimit > upperLimit) {
         std::swap(lowerLimit, upperLimit);
