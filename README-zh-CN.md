@@ -1,6 +1,6 @@
 # PID 控制器库
 
-> [English Documentation](README.md)
+> [Click here for English docs](README.md)
 
 一个功能全面的 C++ PID 控制器库，支持多种算法变体和高级功能。
 
