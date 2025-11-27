@@ -1,5 +1,7 @@
 # PID Controller Library
 
+> [中文文档](README-zh-CN.md)
+
 A comprehensive C++ PID controller library with multiple algorithm variants and advanced features.
 
 ## Features
