@@ -163,7 +163,9 @@ void PIDCtrller::reset() {
  */
 float PIDCtrller::calc(float curr_measurement, float upperLimit, float lowerLimit) {
     if (lowerLimit > upperLimit) {
-        std::swap(lowerLimit, upperLimit);
+        float temp = lowerLimit;
+        lowerLimit = upperLimit;
+        upperLimit = temp;
     }
 
     _error = _target - curr_measurement;
